@@ -1,1 +1,57 @@
-Projeto desenvolvido pelo Coletivo MuSA - www.musa.cc
+######################################################################
+#                     Arduino Project's Skeleton                     #
+######################################################################
+
+1 - Directory Structure
+######################################################################
+# ./                # Project's root directory                       #
+# ./Makefile        # The project Makefile                           #
+# ./scripts         # Scripts' directory                             #
+# ---------/make.rb # The Makefile generator script                  #
+# ---------/size.rb # Size verifier script                           #
+# ---------/...     # Project's remaining scripts                    #
+# ./lib             # Libraries' directory                           #
+# -----/...         # Library "x" directory                          #
+# -----/.../...     # Library "x" source files (scanned recursively) #
+# ./src             # Project's source directory                     #
+# -----/...         # Project's source files (scanned recursively)   #
+# ./include         # Project's headers directory                    #
+# ---------/...     # Project's headers (scanned recursively)        #
+######################################################################
+
+2 - The Output
+The output files will be all the libraries *.a files, the binary
+"project.elf" file, which is converted to "project.hex". This final
+file is then uploaded by running "make upload".
+
+3 - Makefile
+The Makefile is automatically generated every time a modification to
+some directory, to the Makefile and to the generator itself (so it is
+useless to edit it, as it will be recreated).
+It is created by scripts/make.rb, and uses scripts/size.rb to check
+the size of the final program.
+The generator will create all the libraries and the program itself,
+scanning the folders recursivelly.
+Some rules:
+"make": 
+  will generate the final file, "project.hex". It will
+  recreate the Makefile itself if necessary.
+"make upload": 
+  generates the file (if not generated yet) and
+  then uploads it to the Arduino board. It is not necessary to
+  call "make" before it, because it checks if the final file is
+  up to date before doing the upload itself.
+"make clean": deletes all the files created by the project (i.e.,
+  all the *.o files, *.a libraries, the "project.elf" and the "project.hex".
+
+4 - Libraries
+  Libraries may be reused in another project. Each directory inside
+the "lib" directory is considered a different library (e.g., the
+"default" directory will generate the library default.a, with all the
+source codes it may find inside lib/default (scanning recursivelly).
+  To create a new lib, e.g., "foo", create a directory foo in the
+"lib" directory, and populate it with *.c or *.cpp files. The
+Makefile will be automatically recreated and the library rule will
+have been made, and a foo.a file will appear (and will be added to
+the final executable).
+
