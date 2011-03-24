@@ -1,10 +1,10 @@
 #include <WProgram.h>
 
-//frente dir = 2
-// frente esq = 5
+//frente esq = 1
+// frente dir = 5
 
 // tras esq 3
-// tras dir 1
+// tras dir 2
 
 // isso precisa ir pro arquivo.h>
 
@@ -17,9 +17,19 @@ void stopMove();
 
 // ANALOG PINS
 //int temperaturaPin = 0;
+
 int umidadePin = 0;
-int ldrTras =  1;
-int ldrFrente = 2;
+
+int ldrTrasEsq =  3;
+int ldrTrasDir =  1;
+int ldrFrenteEsq = 2;
+int ldrFrenteDir = 5;
+
+// int umidadePin = 0;
+// int ldrTrasEsq =  3;
+// int ldrTrasDir =  2;
+// int ldrFrenteEsq = 1;
+// int ldrFrenteDir = 5;
 
 // DIGITAL PINS
 int colisaoTras = 12; //2
@@ -36,8 +46,8 @@ int soundPin = 8;
 int direcao = 1; // 1 frente 0 tras
 
 // VERIFICA LUZ
-int limiarLuz= 1000; // limiarLuzque define a "luz agradável"
-int limiarUmidade = 750;
+int limiarLuz= 650; // limiarLuzque define a "luz agradável"
+int limiarUmidade = 450;
 //VALUES
 int luzTras;
 int luzFrente;
@@ -49,33 +59,51 @@ void setup()   {
   //ANALOG
   //pinMode(temperaturaPin, INPUT);  
   pinMode(umidadePin, INPUT); 
-  pinMode(ldrTras, INPUT);
-  pinMode(ldrFrente, INPUT);
+  pinMode(ldrTrasEsq, INPUT);
+  pinMode(ldrFrenteEsq, INPUT);
+  pinMode(ldrTrasDir, INPUT);
+  pinMode(ldrFrenteDir, INPUT);
+  
   //DIGITAL
   pinMode(colisaoTras, INPUT);
   pinMode(colisaoFrente, INPUT);
   pinMode(soundPin, OUTPUT);
+  pinMode(left, OUTPUT);
+  pinMode(right, OUTPUT);
+  
 }
 
 void loop()                    
 {
  
-  int luzTras = analogRead(ldrTras);
-  int luzFrente = analogRead(ldrFrente);
+  int luzTrasEsq = analogRead(ldrTrasEsq);
+  int luzTrasDir = analogRead(ldrTrasDir);
+  int luzFrenteEsq = analogRead(ldrFrenteEsq);
+  int luzFrenteDir = analogRead(ldrFrenteDir);
+
   //int temperatura = analogRead(temperaturaPin);
   int umidade = analogRead(umidadePin);
   
   // DEBUGS
-  Serial.print("\nluzTras:");
-  Serial.print(luzTras);
-  Serial.print("\nluzFrente:");
-  Serial.print(luzFrente);
+  Serial.print("\nluzTrasEsq:");
+  Serial.print(luzTrasEsq);
+  Serial.print("\nluzTrasDir:");
+  Serial.print(luzTrasDir);
+  
+  Serial.print("\nluzFrenteEsq:");
+  Serial.print(luzFrenteEsq);
+  Serial.print("\nluzFrenteDir:");
+  Serial.print(luzFrenteDir);
+  
+  Serial.print("\n\n\n");
   Serial.print("\nUmidade:");
   Serial.print(umidade);
  
   colisaoFrenteHappened(); 
   colisaoTrasHappened();
- 
+
+  int luzFrente = (luzFrenteEsq+luzFrenteDir)/2;
+  int luzTras = (luzTrasEsq+luzTrasDir)/2; 
 
   //Se umidade menor que limiar Umidade, executa movimento doidão
   if (umidade > limiarUmidade) {
@@ -100,16 +128,27 @@ void loop()
     // senão, se movimenta em direção do sensor com mais luminosidade 
     }
     else {
-     if (luzTras > luzFrente) {
+      if (((luzTrasEsq > luzFrenteEsq*1.1) and (luzTrasEsq > luzFrenteDir*1.1)) or ((luzTrasDir > luzFrenteDir*1.1) and (luzTrasDir > luzFrenteEsq*1.1))) {
         Serial.print("\n\nandando pra trás!!");
+          
         direcao = 0;
-        colisaoTrasHappened();
         mediumMovement();
+                
+        if (luzTrasEsq > luzTrasDir) { digitalWrite(left, 1); Serial.print("\n\nandando pra esquerda!!"); }
+        else { Serial.print("\n\nandando pra direita!!"); digitalWrite(right, 1); }         
+        colisaoTrasHappened();
+        littleMovement();
+        digitalWrite(left, 0);
+        digitalWrite(right, 0);
       } else {
         Serial.print("\n\nandando pra frente!!");
         direcao = 1;
+        littleMovement();
+        
+        if (luzFrenteEsq > luzFrenteDir) { digitalWrite(left, 1); Serial.print("\n\nandando pra esquerda!!"); }
+        else { Serial.print("\n\nandando pra direita!!"); digitalWrite(right, 1); }           
         colisaoFrenteHappened();
-        mediumMovement(); 
+        littleMovement(); 
       }
      
     }
@@ -152,7 +191,6 @@ void moveForward()
 
 void moveLeft()
 {
-  stopMove();
   pinMode(left, OUTPUT);
   digitalWrite(left, 1);          
   }
@@ -160,7 +198,6 @@ void moveLeft()
 
 void moveRight()
 {
-  stopMove();
   pinMode(right, OUTPUT);
   digitalWrite(right, 1);          
   }
@@ -228,9 +265,9 @@ void crazyMovement()
  void colisaoFrenteHappened() {
     if (digitalRead(colisaoFrente)) {
       direcao = 0;
-      pinMode(left, OUTPUT);
+      //pinMode(left, OUTPUT);
       digitalWrite(left, 1);          
-      mediumMovement();
+      littleMovement();
       mediumMovement();
       digitalWrite(left, 0);          
       Serial.println("\n\n !!!!! Colisao Frente");
@@ -240,7 +277,7 @@ void crazyMovement()
 void colisaoTrasHappened() {
     if (digitalRead(colisaoTras)) {
       direcao = 1;
-      pinMode(right, OUTPUT);
+      //pinMode(right, OUTPUT);
       digitalWrite(right, 1);          
       mediumMovement();
       mediumMovement();

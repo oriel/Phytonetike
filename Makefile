@@ -26,7 +26,7 @@ FORMAT = ihex
 UPLOAD_RATE = 57600
 MAX_SIZE = 30720
 
-OUTPUT = jumpmario
+OUTPUT = Phytonetike
 
 all: $(LIBRARIES) $(OUTPUT).hex
 
